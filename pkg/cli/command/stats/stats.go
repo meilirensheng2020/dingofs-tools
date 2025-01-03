@@ -107,19 +107,19 @@ func NewStatsCommand() *cobra.Command {
 		basecmd.FinalDingoCmd{
 			Use:   "stats mountPoint",
 			Short: "show real time performance statistics of dingofs",
-			Example: `dingo fs stats /mnt/dingofs
+			Example: `dingo stats /mnt/dingofs
 			
 # fuse metrics
-dingo fs stats /mnt/dingofs --schema f
+dingo stats /mnt/dingofs --schema f
 
 # s3 metrics
-dingo fs stats /mnt/dingofs --schema o
+dingo stats /mnt/dingofs --schema o
 
 # More metrics
-dingo fs stats /mnt/dingofs --verbose
+dingo stats /mnt/dingofs --verbose
 
 # Show 3 times
-dingo fs stats /mnt/dingofs --count 3`,
+dingo stats /mnt/dingofs --count 3`,
 		},
 	}
 	return basecmd.NewFinalDingoCli(&statsCmd.FinalDingoCmd, statsCmd)
@@ -136,7 +136,7 @@ func (statsCmd *StatsCommand) Init(cmd *cobra.Command, args []string) error {
 	if len(args) < 1 {
 		return errors.New(`ERROR: This command requires mountPoint
 USAGE:
-   dingo fs stats mountPoint [Flags]`)
+   dingo stats mountPoint [Flags]`)
 	}
 	return nil
 }
