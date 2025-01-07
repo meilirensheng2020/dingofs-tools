@@ -17,12 +17,12 @@ package config
 import (
 	"fmt"
 	"github.com/dingodb/dingofs-tools/pkg/cli/command/common"
-	"github.com/dingodb/dingofs-tools/pkg/cli/command/quota"
 	"strconv"
 
 	cmderror "github.com/dingodb/dingofs-tools/internal/error"
 	cobrautil "github.com/dingodb/dingofs-tools/internal/utils"
 	basecmd "github.com/dingodb/dingofs-tools/pkg/cli/command"
+	cmdCommon "github.com/dingodb/dingofs-tools/pkg/cli/command/common"
 	"github.com/dingodb/dingofs-tools/pkg/config"
 	"github.com/dingodb/dingofs-tools/pkg/output"
 	"github.com/dingodb/dingofs-tools/proto/dingofs/proto/metaserver"
@@ -72,7 +72,7 @@ func (checkQuotaCmd *CheckQuotaCommand) Print(cmd *cobra.Command, args []string)
 }
 
 func (checkQuotaCmd *CheckQuotaCommand) RunCommand(cmd *cobra.Command, args []string) error {
-	fsId, fsErr := quota.GetFsId(checkQuotaCmd.Cmd)
+	fsId, fsErr := cmdCommon.GetFsId(checkQuotaCmd.Cmd)
 	if fsErr != nil {
 		return fsErr
 	}
@@ -82,16 +82,16 @@ func (checkQuotaCmd *CheckQuotaCommand) RunCommand(cmd *cobra.Command, args []st
 	}
 	fsQuota := fsResponse.GetQuota()
 	// get root director real used space
-	realUsedBytes, realUsedInodes, getErr := quota.GetDirectorySizeAndInodes(checkQuotaCmd.Cmd, fsId, config.ROOTINODEID, true)
+	realUsedBytes, realUsedInodes, getErr := cmdCommon.GetDirectorySizeAndInodes(checkQuotaCmd.Cmd, fsId, config.ROOTINODEID, true)
 	if getErr != nil {
 		return getErr
 	}
-	checkResult, ok := quota.CheckQuota(fsQuota.GetMaxBytes(), fsQuota.GetUsedBytes(), fsQuota.GetMaxInodes(), fsQuota.GetUsedInodes(), realUsedBytes, realUsedInodes)
+	checkResult, ok := cmdCommon.CheckQuota(fsQuota.GetMaxBytes(), fsQuota.GetUsedBytes(), fsQuota.GetMaxInodes(), fsQuota.GetUsedInodes(), realUsedBytes, realUsedInodes)
 	repair := config.GetFlagBool(checkQuotaCmd.Cmd, config.DINGOFS_QUOTA_REPAIR)
 
 	if repair && !ok { // inconsistent and need to repair
 		// get poolid copysetid
-		partitionInfo, partErr := quota.GetPartitionInfo(checkQuotaCmd.Cmd, fsId, config.ROOTINODEID)
+		partitionInfo, partErr := cmdCommon.GetPartitionInfo(checkQuotaCmd.Cmd, fsId, config.ROOTINODEID)
 		if partErr != nil {
 			return partErr
 		}
@@ -106,7 +106,7 @@ func (checkQuotaCmd *CheckQuotaCommand) RunCommand(cmd *cobra.Command, args []st
 		checkQuotaCmd.Rpc = &common.SetFsQuotaRpc{
 			Request: request,
 		}
-		addrs, addrErr := quota.GetLeaderPeerAddr(checkQuotaCmd.Cmd, fsId, config.ROOTINODEID)
+		addrs, addrErr := cmdCommon.GetLeaderPeerAddr(checkQuotaCmd.Cmd, fsId, config.ROOTINODEID)
 		if addrErr != nil {
 			return addrErr
 		}
@@ -132,7 +132,7 @@ func (checkQuotaCmd *CheckQuotaCommand) RunCommand(cmd *cobra.Command, args []st
 	} else {
 		header := []string{cobrautil.ROW_FS_ID, cobrautil.ROW_FS_NAME, cobrautil.ROW_CAPACITY, cobrautil.ROW_USED, cobrautil.ROW_REAL_USED, cobrautil.ROW_INODES, cobrautil.ROW_INODES_IUSED, cobrautil.ROW_INODES_REAL_IUSED, cobrautil.ROW_STATUS}
 		checkQuotaCmd.SetHeader(header)
-		fsName, fsErr := quota.GetFsName(checkQuotaCmd.Cmd)
+		fsName, fsErr := cmdCommon.GetFsName(checkQuotaCmd.Cmd)
 		if fsErr != nil {
 			return fsErr
 		}

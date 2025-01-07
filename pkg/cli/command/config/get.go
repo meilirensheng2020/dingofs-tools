@@ -23,7 +23,7 @@ import (
 	cmderror "github.com/dingodb/dingofs-tools/internal/error"
 	cobrautil "github.com/dingodb/dingofs-tools/internal/utils"
 	basecmd "github.com/dingodb/dingofs-tools/pkg/cli/command"
-	"github.com/dingodb/dingofs-tools/pkg/cli/command/quota"
+	cmdCommon "github.com/dingodb/dingofs-tools/pkg/cli/command/common"
 	"github.com/dingodb/dingofs-tools/pkg/config"
 	"github.com/dingodb/dingofs-tools/pkg/output"
 	"github.com/spf13/cobra"
@@ -77,7 +77,7 @@ func (fsQuotaCmd *GetFsQuotaCommand) Print(cmd *cobra.Command, args []string) er
 
 func (fsQuotaCmd *GetFsQuotaCommand) RunCommand(cmd *cobra.Command, args []string) error {
 
-	fsId, fsErr := quota.GetFsId(fsQuotaCmd.Cmd)
+	fsId, fsErr := cmdCommon.GetFsId(fsQuotaCmd.Cmd)
 	if fsErr != nil {
 		return fsErr
 	}
@@ -86,9 +86,9 @@ func (fsQuotaCmd *GetFsQuotaCommand) RunCommand(cmd *cobra.Command, args []strin
 		return err
 	}
 	fsQuota := response.GetQuota()
-	quotaValueSlice := quota.ConvertQuotaToHumanizeValue(fsQuota.GetMaxBytes(), fsQuota.GetUsedBytes(), fsQuota.GetMaxInodes(), fsQuota.GetUsedInodes())
+	quotaValueSlice := cmdCommon.ConvertQuotaToHumanizeValue(fsQuota.GetMaxBytes(), fsQuota.GetUsedBytes(), fsQuota.GetMaxInodes(), fsQuota.GetUsedInodes())
 	//get filesystem name
-	fsName, fsErr := quota.GetFsName(cmd)
+	fsName, fsErr := cmdCommon.GetFsName(cmd)
 	if fsErr != nil {
 		return fsErr
 	}
@@ -120,7 +120,7 @@ func (fsQuotaCmd *GetFsQuotaCommand) ResultPlainOutput() error {
 
 func GetFsQuotaData(cmd *cobra.Command, fsId uint32) (*metaserver.GetFsQuotaRequest, *metaserver.GetFsQuotaResponse, error) {
 	// get poolid copysetid
-	partitionInfo, partErr := quota.GetPartitionInfo(cmd, fsId, config.ROOTINODEID)
+	partitionInfo, partErr := cmdCommon.GetPartitionInfo(cmd, fsId, config.ROOTINODEID)
 	if partErr != nil {
 		return nil, nil, partErr
 	}
@@ -134,7 +134,7 @@ func GetFsQuotaData(cmd *cobra.Command, fsId uint32) (*metaserver.GetFsQuotaRequ
 	requestRpc := &common.GetFsQuotaRpc{
 		Request: request,
 	}
-	addrs, addrErr := quota.GetLeaderPeerAddr(cmd, uint32(fsId), config.ROOTINODEID)
+	addrs, addrErr := cmdCommon.GetLeaderPeerAddr(cmd, uint32(fsId), config.ROOTINODEID)
 	if addrErr != nil {
 		return nil, nil, addrErr
 	}

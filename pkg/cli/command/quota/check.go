@@ -15,45 +15,26 @@
 package quota
 
 import (
-	"context"
 	"fmt"
 	"strconv"
 
 	cmderror "github.com/dingodb/dingofs-tools/internal/error"
 	cobrautil "github.com/dingodb/dingofs-tools/internal/utils"
 	basecmd "github.com/dingodb/dingofs-tools/pkg/cli/command"
+	cmdCommon "github.com/dingodb/dingofs-tools/pkg/cli/command/common"
 	"github.com/dingodb/dingofs-tools/pkg/config"
 	"github.com/dingodb/dingofs-tools/pkg/output"
 	"github.com/dingodb/dingofs-tools/proto/dingofs/proto/metaserver"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"google.golang.org/grpc"
 )
-
-type CheckQuotaRpc struct {
-	Info             *basecmd.Rpc
-	Request          *metaserver.SetDirQuotaRequest
-	metaServerClient metaserver.MetaServerServiceClient
-}
-
-var _ basecmd.RpcFunc = (*CheckQuotaRpc)(nil) // check interface
 
 type CheckQuotaCommand struct {
 	basecmd.FinalDingoCmd
-	Rpc *CheckQuotaRpc
+	Rpc *cmdCommon.CheckQuotaRpc
 }
 
 var _ basecmd.FinalDingoCmdFunc = (*CheckQuotaCommand)(nil) // check interface
-
-func (checkQuotaRpc *CheckQuotaRpc) NewRpcClient(cc grpc.ClientConnInterface) {
-	checkQuotaRpc.metaServerClient = metaserver.NewMetaServerServiceClient(cc)
-}
-
-func (checkQuotaRpc *CheckQuotaRpc) Stub_Func(ctx context.Context) (interface{}, error) {
-	response, err := checkQuotaRpc.metaServerClient.SetDirQuota(ctx, checkQuotaRpc.Request)
-	output.ShowRpcData(checkQuotaRpc.Request, response, checkQuotaRpc.Info.RpcDataShow)
-	return response, err
-}
 
 func NewCheckQuotaCommand() *cobra.Command {
 	checkQuotaCmd := &CheckQuotaCommand{
@@ -100,22 +81,22 @@ func (checkQuotaCmd *CheckQuotaCommand) RunCommand(cmd *cobra.Command, args []st
 	fsId := dirQuotaRequest.GetFsId()
 	dirQuota := dirQuotaResponse.GetQuota()
 	// get inode by path
-	dirInode, dirErr := GetDirPathInodeId(cmd, fsId, path)
+	dirInode, dirErr := cmdCommon.GetDirPathInodeId(cmd, fsId, path)
 	if dirErr != nil {
 		return dirErr
 	}
 	// get real used space
-	realUsedBytes, realUsedInodes, getErr := GetDirectorySizeAndInodes(checkQuotaCmd.Cmd, fsId, dirInode, false)
+	realUsedBytes, realUsedInodes, getErr := cmdCommon.GetDirectorySizeAndInodes(checkQuotaCmd.Cmd, fsId, dirInode, false)
 	if getErr != nil {
 		return getErr
 	}
-	checkResult, ok := CheckQuota(dirQuota.GetMaxBytes(), dirQuota.GetUsedBytes(), dirQuota.GetMaxInodes(), dirQuota.GetUsedInodes(), realUsedBytes, realUsedInodes)
+	checkResult, ok := cmdCommon.CheckQuota(dirQuota.GetMaxBytes(), dirQuota.GetUsedBytes(), dirQuota.GetMaxInodes(), dirQuota.GetUsedInodes(), realUsedBytes, realUsedInodes)
 	repair := config.GetFlagBool(checkQuotaCmd.Cmd, config.DINGOFS_QUOTA_REPAIR)
 	dirInodeId := dirQuotaRequest.GetDirInodeId()
 
 	if repair && !ok { // inconsistent and need to repair
 		// get poolid copysetid
-		partitionInfo, partErr := GetPartitionInfo(checkQuotaCmd.Cmd, fsId, config.ROOTINODEID)
+		partitionInfo, partErr := cmdCommon.GetPartitionInfo(checkQuotaCmd.Cmd, fsId, config.ROOTINODEID)
 		if partErr != nil {
 			return partErr
 		}
@@ -129,10 +110,10 @@ func (checkQuotaCmd *CheckQuotaCommand) RunCommand(cmd *cobra.Command, args []st
 			DirInodeId: &dirInodeId,
 			Quota:      &metaserver.Quota{UsedBytes: &realUsedBytes, UsedInodes: &realUsedInodes},
 		}
-		checkQuotaCmd.Rpc = &CheckQuotaRpc{
+		checkQuotaCmd.Rpc = &cmdCommon.CheckQuotaRpc{
 			Request: request,
 		}
-		addrs, addrErr := GetLeaderPeerAddr(checkQuotaCmd.Cmd, fsId, config.ROOTINODEID)
+		addrs, addrErr := cmdCommon.GetLeaderPeerAddr(checkQuotaCmd.Cmd, fsId, config.ROOTINODEID)
 		if addrErr != nil {
 			return addrErr
 		}

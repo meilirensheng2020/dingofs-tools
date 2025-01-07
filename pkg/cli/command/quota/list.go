@@ -15,45 +15,26 @@
 package quota
 
 import (
-	"context"
 	"fmt"
 	"syscall"
 
 	cmderror "github.com/dingodb/dingofs-tools/internal/error"
 	cobrautil "github.com/dingodb/dingofs-tools/internal/utils"
 	basecmd "github.com/dingodb/dingofs-tools/pkg/cli/command"
+	cmdCommon "github.com/dingodb/dingofs-tools/pkg/cli/command/common"
 	"github.com/dingodb/dingofs-tools/pkg/config"
 	"github.com/dingodb/dingofs-tools/pkg/output"
 	"github.com/dingodb/dingofs-tools/proto/dingofs/proto/metaserver"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"google.golang.org/grpc"
 )
-
-type ListQuotaRpc struct {
-	Info             *basecmd.Rpc
-	Request          *metaserver.LoadDirQuotasRequest
-	metaServerClient metaserver.MetaServerServiceClient
-}
-
-var _ basecmd.RpcFunc = (*ListQuotaRpc)(nil) // check interface
 
 type ListQuotaCommand struct {
 	basecmd.FinalDingoCmd
-	Rpc *ListQuotaRpc
+	Rpc *cmdCommon.ListQuotaRpc
 }
 
 var _ basecmd.FinalDingoCmdFunc = (*ListQuotaCommand)(nil) // check interface
-
-func (listQuotaRpc *ListQuotaRpc) NewRpcClient(cc grpc.ClientConnInterface) {
-	listQuotaRpc.metaServerClient = metaserver.NewMetaServerServiceClient(cc)
-}
-
-func (listQuotaRpc *ListQuotaRpc) Stub_Func(ctx context.Context) (interface{}, error) {
-	response, err := listQuotaRpc.metaServerClient.LoadDirQuotas(ctx, listQuotaRpc.Request)
-	output.ShowRpcData(listQuotaRpc.Request, response, listQuotaRpc.Info.RpcDataShow)
-	return response, err
-}
 
 func NewListQuotaCommand() *cobra.Command {
 	listQuotaCmd := &ListQuotaCommand{
@@ -83,12 +64,12 @@ func (listQuotaCmd *ListQuotaCommand) Init(cmd *cobra.Command, args []string) er
 		return fmt.Errorf(getAddrErr.Message)
 	}
 	//check flags values
-	fsId, fsErr := GetFsId(cmd)
+	fsId, fsErr := cmdCommon.GetFsId(cmd)
 	if fsErr != nil {
 		return fsErr
 	}
 	// get poolid copysetid
-	partitionInfo, partErr := GetPartitionInfo(listQuotaCmd.Cmd, fsId, config.ROOTINODEID)
+	partitionInfo, partErr := cmdCommon.GetPartitionInfo(listQuotaCmd.Cmd, fsId, config.ROOTINODEID)
 	if partErr != nil {
 		return partErr
 	}
@@ -99,11 +80,11 @@ func (listQuotaCmd *ListQuotaCommand) Init(cmd *cobra.Command, args []string) er
 		CopysetId: &copyetId,
 		FsId:      &fsId,
 	}
-	listQuotaCmd.Rpc = &ListQuotaRpc{
+	listQuotaCmd.Rpc = &cmdCommon.ListQuotaRpc{
 		Request: request,
 	}
 	//get request addr leader
-	addrs, addrErr := GetLeaderPeerAddr(listQuotaCmd.Cmd, fsId, config.ROOTINODEID)
+	addrs, addrErr := cmdCommon.GetLeaderPeerAddr(listQuotaCmd.Cmd, fsId, config.ROOTINODEID)
 	if addrErr != nil {
 		return addrErr
 	}
@@ -136,8 +117,8 @@ func (listQuotaCmd *ListQuotaCommand) RunCommand(cmd *cobra.Command, args []stri
 	rows := make([]map[string]string, 0)
 	for dirInode, quota := range response.GetQuotas() {
 		row := make(map[string]string)
-		quotaValueSlice := ConvertQuotaToHumanizeValue(quota.GetMaxBytes(), quota.GetUsedBytes(), quota.GetMaxInodes(), quota.GetUsedInodes())
-		dirPath, dirErr := GetInodePath(listQuotaCmd.Cmd, listQuotaCmd.Rpc.Request.GetFsId(), dirInode)
+		quotaValueSlice := cmdCommon.ConvertQuotaToHumanizeValue(quota.GetMaxBytes(), quota.GetUsedBytes(), quota.GetMaxInodes(), quota.GetUsedInodes())
+		dirPath, dirErr := cmdCommon.GetInodePath(listQuotaCmd.Cmd, listQuotaCmd.Rpc.Request.GetFsId(), dirInode)
 		if dirErr == syscall.ENOENT {
 			continue
 		}

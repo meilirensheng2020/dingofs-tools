@@ -15,47 +15,28 @@
 package quota
 
 import (
-	"context"
 	"fmt"
 	"strconv"
 
 	cmderror "github.com/dingodb/dingofs-tools/internal/error"
 	cobrautil "github.com/dingodb/dingofs-tools/internal/utils"
 	basecmd "github.com/dingodb/dingofs-tools/pkg/cli/command"
+	cmdCommon "github.com/dingodb/dingofs-tools/pkg/cli/command/common"
 	"github.com/dingodb/dingofs-tools/pkg/config"
 	"github.com/dingodb/dingofs-tools/pkg/output"
 	"github.com/dingodb/dingofs-tools/proto/dingofs/proto/metaserver"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"google.golang.org/grpc"
 )
-
-type GetQuotaRpc struct {
-	Info             *basecmd.Rpc
-	Request          *metaserver.GetDirQuotaRequest
-	metaServerClient metaserver.MetaServerServiceClient
-}
-
-var _ basecmd.RpcFunc = (*GetQuotaRpc)(nil) // check interface
 
 type GetQuotaCommand struct {
 	basecmd.FinalDingoCmd
-	Rpc      *GetQuotaRpc
+	Rpc      *cmdCommon.GetQuotaRpc
 	Path     string
 	Response *metaserver.GetDirQuotaResponse
 }
 
 var _ basecmd.FinalDingoCmdFunc = (*GetQuotaCommand)(nil) // check interface
-
-func (getQuotaRpc *GetQuotaRpc) NewRpcClient(cc grpc.ClientConnInterface) {
-	getQuotaRpc.metaServerClient = metaserver.NewMetaServerServiceClient(cc)
-}
-
-func (getQuotaRpc *GetQuotaRpc) Stub_Func(ctx context.Context) (interface{}, error) {
-	response, err := getQuotaRpc.metaServerClient.GetDirQuota(ctx, getQuotaRpc.Request)
-	output.ShowRpcData(getQuotaRpc.Request, response, getQuotaRpc.Info.RpcDataShow)
-	return response, err
-}
 
 func NewGetQuotaDataCommand() *GetQuotaCommand {
 	getQuotaCmd := &GetQuotaCommand{
@@ -89,7 +70,7 @@ func (getQuotaCmd *GetQuotaCommand) Init(cmd *cobra.Command, args []string) erro
 		return fmt.Errorf(getAddrErr.Message)
 	}
 	//check flags values
-	fsId, fsErr := GetFsId(getQuotaCmd.Cmd)
+	fsId, fsErr := cmdCommon.GetFsId(getQuotaCmd.Cmd)
 	if fsErr != nil {
 		return fsErr
 	}
@@ -99,12 +80,12 @@ func (getQuotaCmd *GetQuotaCommand) Init(cmd *cobra.Command, args []string) erro
 	}
 	getQuotaCmd.Path = path
 	//get inodeid
-	dirInodeId, inodeErr := GetDirPathInodeId(getQuotaCmd.Cmd, fsId, getQuotaCmd.Path)
+	dirInodeId, inodeErr := cmdCommon.GetDirPathInodeId(getQuotaCmd.Cmd, fsId, getQuotaCmd.Path)
 	if inodeErr != nil {
 		return inodeErr
 	}
 	// get poolid copysetid
-	partitionInfo, partErr := GetPartitionInfo(getQuotaCmd.Cmd, fsId, config.ROOTINODEID)
+	partitionInfo, partErr := cmdCommon.GetPartitionInfo(getQuotaCmd.Cmd, fsId, config.ROOTINODEID)
 	if partErr != nil {
 		return partErr
 	}
@@ -117,11 +98,11 @@ func (getQuotaCmd *GetQuotaCommand) Init(cmd *cobra.Command, args []string) erro
 		FsId:       &fsId,
 		DirInodeId: &dirInodeId,
 	}
-	getQuotaCmd.Rpc = &GetQuotaRpc{
+	getQuotaCmd.Rpc = &cmdCommon.GetQuotaRpc{
 		Request: request,
 	}
 	//get request addr leader
-	addrs, addrErr := GetLeaderPeerAddr(getQuotaCmd.Cmd, fsId, config.ROOTINODEID)
+	addrs, addrErr := cmdCommon.GetLeaderPeerAddr(getQuotaCmd.Cmd, fsId, config.ROOTINODEID)
 	if addrErr != nil {
 		return addrErr
 	}
@@ -152,7 +133,7 @@ func (getQuotaCmd *GetQuotaCommand) RunCommand(cmd *cobra.Command, args []string
 		return cmderror.ErrQuota(int(statusCode)).ToError()
 	}
 	quota := response.GetQuota()
-	quotaValueSlice := ConvertQuotaToHumanizeValue(quota.GetMaxBytes(), quota.GetUsedBytes(), quota.GetMaxInodes(), quota.GetUsedInodes())
+	quotaValueSlice := cmdCommon.ConvertQuotaToHumanizeValue(quota.GetMaxBytes(), quota.GetUsedBytes(), quota.GetMaxInodes(), quota.GetUsedInodes())
 	row := map[string]string{
 		cobrautil.ROW_ID:             strconv.FormatUint(getQuotaCmd.Rpc.Request.GetDirInodeId(), 10),
 		cobrautil.ROW_PATH:           getQuotaCmd.Path,
