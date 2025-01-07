@@ -20,7 +20,7 @@ import (
 	cobrautil "github.com/dingodb/dingofs-tools/internal/utils"
 	basecmd "github.com/dingodb/dingofs-tools/pkg/cli/command"
 	"github.com/dingodb/dingofs-tools/pkg/cli/command/common"
-	"github.com/dingodb/dingofs-tools/pkg/cli/command/quota"
+	cmdCommon "github.com/dingodb/dingofs-tools/pkg/cli/command/common"
 	"github.com/dingodb/dingofs-tools/pkg/config"
 	"github.com/dingodb/dingofs-tools/pkg/output"
 	"github.com/dingodb/dingofs-tools/proto/dingofs/proto/metaserver"
@@ -67,17 +67,17 @@ func (fsQuotaCmd *ConfigFsQuotaCommand) Init(cmd *cobra.Command, args []string) 
 		return fmt.Errorf(getAddrErr.Message)
 	}
 	// check flags values
-	capacity, inodes, quotaErr := quota.CheckAndGetQuotaValue(fsQuotaCmd.Cmd)
+	capacity, inodes, quotaErr := cmdCommon.CheckAndGetQuotaValue(fsQuotaCmd.Cmd)
 	if quotaErr != nil {
 		return quotaErr
 	}
 	// get fs id
-	fsId, fsErr := quota.GetFsId(cmd)
+	fsId, fsErr := cmdCommon.GetFsId(cmd)
 	if fsErr != nil {
 		return fsErr
 	}
 	// get poolid copysetid
-	partitionInfo, partErr := quota.GetPartitionInfo(fsQuotaCmd.Cmd, fsId, config.ROOTINODEID)
+	partitionInfo, partErr := cmdCommon.GetPartitionInfo(fsQuotaCmd.Cmd, fsId, config.ROOTINODEID)
 	if partErr != nil {
 		return partErr
 	}
@@ -94,7 +94,7 @@ func (fsQuotaCmd *ConfigFsQuotaCommand) Init(cmd *cobra.Command, args []string) 
 		Request: request,
 	}
 	// get leader
-	addrs, addrErr := quota.GetLeaderPeerAddr(fsQuotaCmd.Cmd, fsId, config.ROOTINODEID)
+	addrs, addrErr := cmdCommon.GetLeaderPeerAddr(fsQuotaCmd.Cmd, fsId, config.ROOTINODEID)
 	if addrErr != nil {
 		return addrErr
 	}

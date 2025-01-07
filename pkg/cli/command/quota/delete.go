@@ -15,44 +15,25 @@
 package quota
 
 import (
-	"context"
 	"fmt"
 
 	cmderror "github.com/dingodb/dingofs-tools/internal/error"
 	cobrautil "github.com/dingodb/dingofs-tools/internal/utils"
 	basecmd "github.com/dingodb/dingofs-tools/pkg/cli/command"
+	cmdCommon "github.com/dingodb/dingofs-tools/pkg/cli/command/common"
 	"github.com/dingodb/dingofs-tools/pkg/config"
 	"github.com/dingodb/dingofs-tools/pkg/output"
 	"github.com/dingodb/dingofs-tools/proto/dingofs/proto/metaserver"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"google.golang.org/grpc"
 )
-
-type DeleteQuotaRpc struct {
-	Info             *basecmd.Rpc
-	Request          *metaserver.DeleteDirQuotaRequest
-	metaServerClient metaserver.MetaServerServiceClient
-}
-
-var _ basecmd.RpcFunc = (*DeleteQuotaRpc)(nil) // check interface
 
 type DeleteQuotaCommand struct {
 	basecmd.FinalDingoCmd
-	Rpc *DeleteQuotaRpc
+	Rpc *cmdCommon.DeleteQuotaRpc
 }
 
 var _ basecmd.FinalDingoCmdFunc = (*DeleteQuotaCommand)(nil) // check interface
-
-func (deleteQuotaRpc *DeleteQuotaRpc) NewRpcClient(cc grpc.ClientConnInterface) {
-	deleteQuotaRpc.metaServerClient = metaserver.NewMetaServerServiceClient(cc)
-}
-
-func (deleteQuotaRpc *DeleteQuotaRpc) Stub_Func(ctx context.Context) (interface{}, error) {
-	response, err := deleteQuotaRpc.metaServerClient.DeleteDirQuota(ctx, deleteQuotaRpc.Request)
-	output.ShowRpcData(deleteQuotaRpc.Request, response, deleteQuotaRpc.Info.RpcDataShow)
-	return response, err
-}
 
 func NewDeleteQuotaCommand() *cobra.Command {
 	deleteQuotaCmd := &DeleteQuotaCommand{
@@ -82,7 +63,7 @@ func (deleteQuotaCmd *DeleteQuotaCommand) Init(cmd *cobra.Command, args []string
 		return fmt.Errorf(getAddrErr.Message)
 	}
 	//check flags values
-	fsId, fsErr := GetFsId(cmd)
+	fsId, fsErr := cmdCommon.GetFsId(cmd)
 	if fsErr != nil {
 		return fsErr
 	}
@@ -91,12 +72,12 @@ func (deleteQuotaCmd *DeleteQuotaCommand) Init(cmd *cobra.Command, args []string
 		return fmt.Errorf("path is required")
 	}
 	//get inodeid
-	dirInodeId, inodeErr := GetDirPathInodeId(deleteQuotaCmd.Cmd, fsId, path)
+	dirInodeId, inodeErr := cmdCommon.GetDirPathInodeId(deleteQuotaCmd.Cmd, fsId, path)
 	if inodeErr != nil {
 		return inodeErr
 	}
 	// get poolid copysetid
-	partitionInfo, partErr := GetPartitionInfo(deleteQuotaCmd.Cmd, fsId, config.ROOTINODEID)
+	partitionInfo, partErr := cmdCommon.GetPartitionInfo(deleteQuotaCmd.Cmd, fsId, config.ROOTINODEID)
 	if partErr != nil {
 		return partErr
 	}
@@ -109,11 +90,11 @@ func (deleteQuotaCmd *DeleteQuotaCommand) Init(cmd *cobra.Command, args []string
 		FsId:       &fsId,
 		DirInodeId: &dirInodeId,
 	}
-	deleteQuotaCmd.Rpc = &DeleteQuotaRpc{
+	deleteQuotaCmd.Rpc = &cmdCommon.DeleteQuotaRpc{
 		Request: request,
 	}
 	//get request addr leader
-	addrs, addrErr := GetLeaderPeerAddr(deleteQuotaCmd.Cmd, fsId, config.ROOTINODEID)
+	addrs, addrErr := cmdCommon.GetLeaderPeerAddr(deleteQuotaCmd.Cmd, fsId, config.ROOTINODEID)
 	if addrErr != nil {
 		return addrErr
 	}
