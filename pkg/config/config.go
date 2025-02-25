@@ -54,7 +54,6 @@ const (
 	VERBOSE                        = "verbose"
 	VIPER_GLOBALE_VERBOSE          = "global.verbose"
 	DEFAULT_VERBOSE                = false
-	MAX_CHANNEL_SIZE               = "maxChannelSize"
 	VIPER_GLOBALE_MAX_CHANNEL_SIZE = "global.maxChannelSize"
 	DEFAULT_MAX_CHANNEL_SIZE       = int32(4)
 )

@@ -1,8 +1,7 @@
 global:
   httpTimeout: 500ms
-  rpcTimeout: 500ms
-  rpcRetryTimes: 1
-  maxChannelSize: 4
+  rpcTimeout: 5s
+  rpcRetryTimes: 5
   showError: false
 
 dingofs:

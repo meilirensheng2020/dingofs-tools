@@ -938,7 +938,7 @@ or
 #### stats
 #### stats mountpoint
 
-show real time performance statistics of dingofs mountpoin
+show real time performance statistics of dingofs mountpoint
 
 Usage:
 

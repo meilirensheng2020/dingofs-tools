@@ -450,7 +450,7 @@ var (
 		case mds.FSStatusCode_OK:
 			message = "success"
 		case mds.FSStatusCode_FS_EXIST:
-			message = "fs exist, but s3 info is not inconsistent"
+			message = "fsname is already exist"
 		case mds.FSStatusCode_S3_INFO_ERROR:
 			message = "s3 info is not available"
 		case mds.FSStatusCode_FSNAME_INVALID:
