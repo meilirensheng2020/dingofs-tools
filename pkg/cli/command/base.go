@@ -346,7 +346,12 @@ type Result struct {
 }
 
 func GetRpcResponse(rpc *Rpc, rpcFunc RpcFunc) (interface{}, *cmderror.CmdError) {
-	reqAddrs := GetResuestHosts(rpc.Addrs)
+	var reqAddrs []string
+	if config.MDSApiV2 {
+		reqAddrs = rpc.Addrs
+	} else {
+		reqAddrs = GetResuestHosts(rpc.Addrs)
+	}
 	// start rpc request
 	results := make([]Result, 0)
 	for _, address := range reqAddrs {
@@ -381,6 +386,9 @@ func GetRpcResponse(rpc *Rpc, rpcFunc RpcFunc) (interface{}, *cmderror.CmdError)
 				}
 			}
 			pool.PutConnection(address, conn)
+			if config.MDSApiV2 { // mdsv2 just choose one available mds
+				break
+			}
 		}
 	}
 	// get the rpc response result
