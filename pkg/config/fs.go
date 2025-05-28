@@ -627,7 +627,7 @@ func AddFsNameRequiredFlag(cmd *cobra.Command) {
 
 // fs name
 func AddFsNameSliceOptionFlag(cmd *cobra.Command) {
-	cmd.Flags().StringSlice(DINGOFS_FSNAME, nil, "fs name")
+	cmd.Flags().StringSlice(DINGOFS_FSNAME, nil, "fs name,should be like fs1,fs2,fs3")
 	err := viper.BindPFlag(VIPER_DINGOFS_FSNAME, cmd.Flags().Lookup(DINGOFS_FSNAME))
 	if err != nil {
 		cobra.CheckErr(err)

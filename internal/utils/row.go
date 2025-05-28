@@ -37,7 +37,7 @@ const (
 	ROW_COPYSET_KEY     = "copysetKey"
 	ROW_CREATE_TIME     = "createTime"
 	ROW_CREATED         = "created"
-	ROW_CTIME           = "ctime"
+	ROW_LASTONLINETIME  = "lastonlinetime"
 	ROW_DUMMY_ADDR      = "dummyAddr"
 	ROW_END             = "end"
 	ROW_EPOCH           = "epoch"
@@ -114,14 +114,6 @@ const (
 	ROW_USED            = "used"
 	ROW_VERSION         = "version"
 	ROW_ZONE            = "zone"
-
-	ROW_RW_STATUS         = "rwStatus"
-	ROW_DISK_STATE        = "diskState"
-	ROW_COPYSET_NUM       = "copysetNum"
-	ROW_DISK_CAPACITY     = "diskCapacity"
-	ROW_DISK_USED         = "diskUsed"
-	ROW_UNHEALTHY_COPYSET = "unhealthyCopyset"
-	ROW_EXT_ADDR          = "extAddr"
 
 	// s3
 	ROW_S3CHUNKINFO_CHUNKID = "s3ChunkId"

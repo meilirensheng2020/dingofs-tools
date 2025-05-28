@@ -27,7 +27,6 @@ import (
 	"os"
 
 	"github.com/dingodb/dingofs-tools/pkg/cli/command/check"
-	quotaconfig "github.com/dingodb/dingofs-tools/pkg/cli/command/config"
 	"github.com/dingodb/dingofs-tools/pkg/cli/command/create"
 	"github.com/dingodb/dingofs-tools/pkg/cli/command/delete"
 	"github.com/dingodb/dingofs-tools/pkg/cli/command/gateway"
@@ -38,33 +37,53 @@ import (
 	"github.com/dingodb/dingofs-tools/pkg/cli/command/status"
 	"github.com/dingodb/dingofs-tools/pkg/cli/command/umount"
 	"github.com/dingodb/dingofs-tools/pkg/cli/command/usage"
+	"github.com/dingodb/dingofs-tools/pkg/cli/command/version"
 	"github.com/dingodb/dingofs-tools/pkg/cli/command/warmup"
 	"github.com/dingodb/dingofs-tools/pkg/config"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
 	cobratemplate "github.com/dingodb/dingofs-tools/internal/utils/template"
-	"github.com/dingodb/dingofs-tools/pkg/cli/command/version"
+	quotaconfig "github.com/dingodb/dingofs-tools/pkg/cli/command/config"
+	v2Config "github.com/dingodb/dingofs-tools/pkg/cli/command/v2/config"
+	v2Create "github.com/dingodb/dingofs-tools/pkg/cli/command/v2/create"
+	v2Delete "github.com/dingodb/dingofs-tools/pkg/cli/command/v2/delete"
+	v2List "github.com/dingodb/dingofs-tools/pkg/cli/command/v2/list"
+	v2Query "github.com/dingodb/dingofs-tools/pkg/cli/command/v2/query"
+	v2Status "github.com/dingodb/dingofs-tools/pkg/cli/command/v2/status"
 )
 
 func addSubCommands(cmd *cobra.Command) {
-	cmd.AddCommand(
-		usage.NewUsageCommand(),
-		list.NewListCommand(),
-		status.NewStatusCommand(),
-		umount.NewUmountCommand(),
-		query.NewQueryCommand(),
-		delete.NewDeleteCommand(),
-		create.NewCreateCommand(),
-		check.NewCheckCommand(),
-		warmup.NewWarmupCommand(),
-		stats.NewStatsCommand(),
-		quota.NewQuotaCommand(),
-		quotaconfig.NewConfigCommand(),
-		gateway.NewGatewayCommand(),
-		version.NewVersionCommand(),
-	)
+	if config.MDSApiV2 {
+		cmd.AddCommand(
+			version.NewVersionCommand(),
+			gateway.NewGatewayCommand(),
+			warmup.NewWarmupCommand(),
+			v2List.NewListCommand(),
+			v2Create.NewCreateCommand(),
+			v2Delete.NewDeleteCommand(),
+			v2Status.NewStatusCommand(),
+			v2Config.NewConfigCommand(),
+			v2Query.NewQueryCommand(),
+		)
+	} else {
+		cmd.AddCommand(
+			usage.NewUsageCommand(),
+			list.NewListCommand(),
+			status.NewStatusCommand(),
+			umount.NewUmountCommand(),
+			query.NewQueryCommand(),
+			delete.NewDeleteCommand(),
+			create.NewCreateCommand(),
+			check.NewCheckCommand(),
+			warmup.NewWarmupCommand(),
+			stats.NewStatsCommand(),
+			quota.NewQuotaCommand(),
+			quotaconfig.NewConfigCommand(),
+			gateway.NewGatewayCommand(),
+			version.NewVersionCommand(),
+		)
+	}
 }
 
 func setupRootCommand(cmd *cobra.Command) {
