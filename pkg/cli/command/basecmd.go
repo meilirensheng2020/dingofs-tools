@@ -15,6 +15,8 @@
 package basecmd
 
 import (
+	"fmt"
+	"github.com/dingodb/dingofs-tools/pkg/base"
 	"os"
 
 	cmderror "github.com/dingodb/dingofs-tools/internal/error"
@@ -126,4 +128,21 @@ func NewMidDingoCli(cli *MidDingoCmd, add MidDingoCmdFunc) *cobra.Command {
 	}
 	add.AddSubCommands()
 	return cli.Cmd
+}
+
+// create new mds rpc
+func CreateNewMdsRpc(cmd *cobra.Command, serviceName string) (*base.Rpc, error) {
+	// get mds address
+	addrs, getAddrErr := config.GetFsMdsAddrSlice(cmd)
+	if getAddrErr.TypeCode() != cmderror.CODE_SUCCESS {
+		return nil, fmt.Errorf(getAddrErr.Message)
+	}
+	// new rpc
+	timeout := config.GetRpcTimeout(cmd)
+	retryTimes := config.GetRpcRetryTimes(cmd)
+	//retryDelay := config.GetRpcRetryDelay(cmd)
+	mdsRpc := base.NewRpc(addrs, timeout, retryTimes, serviceName)
+	mdsRpc.RpcDataShow = config.GetFlagBool(cmd, "verbose")
+
+	return mdsRpc, nil
 }

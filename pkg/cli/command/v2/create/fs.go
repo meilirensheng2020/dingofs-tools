@@ -87,7 +87,7 @@ func (fCmd *FsCommand) AddFlags() {
 
 func (fCmd *FsCommand) Init(cmd *cobra.Command, args []string) error {
 	// new prc
-	mdsRpc, err := common.CreateNewMdsRpc(cmd, "CreateFs")
+	mdsRpc, err := basecmd.CreateNewMdsRpc(cmd, "CreateFs")
 	if err != nil {
 		return err
 	}

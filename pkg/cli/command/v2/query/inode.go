@@ -66,7 +66,7 @@ func (inodeCmd *InodeCommand) AddFlags() {
 
 func (inodeCmd *InodeCommand) Init(cmd *cobra.Command, args []string) error {
 	// new rpc
-	mdsRpc, mdsErr := common.CreateNewMdsRpc(cmd, "GetInode")
+	mdsRpc, mdsErr := basecmd.CreateNewMdsRpc(cmd, "GetInode")
 	if mdsErr != nil {
 		return mdsErr
 	}

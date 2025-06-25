@@ -62,7 +62,7 @@ func (fCmd *FsCommand) AddFlags() {
 
 func (fCmd *FsCommand) Init(cmd *cobra.Command, args []string) error {
 	// new rpc
-	mdsRpc, err := common.CreateNewMdsRpc(cmd, "DeleteFs")
+	mdsRpc, err := basecmd.CreateNewMdsRpc(cmd, "DeleteFs")
 	if err != nil {
 		return err
 	}

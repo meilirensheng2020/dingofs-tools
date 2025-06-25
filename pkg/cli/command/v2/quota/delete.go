@@ -59,7 +59,7 @@ func (deleteQuotaCmd *DeleteQuotaCommand) AddFlags() {
 
 func (deleteQuotaCmd *DeleteQuotaCommand) Init(cmd *cobra.Command, args []string) error {
 	// new prc
-	mdsRpc, err := common.CreateNewMdsRpc(cmd, "DeleteDirQuota")
+	mdsRpc, err := basecmd.CreateNewMdsRpc(cmd, "DeleteDirQuota")
 	if err != nil {
 		return err
 	}

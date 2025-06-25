@@ -93,7 +93,7 @@ func (queryFSCmd *QueryFsCommand) Init(cmd *cobra.Command, args []string) error 
 			},
 		}
 		// new rpc
-		mdsRpc, err := common.CreateNewMdsRpc(cmd, "GetFsInfo")
+		mdsRpc, err := basecmd.CreateNewMdsRpc(cmd, "GetFsInfo")
 		if err != nil {
 			return err
 		}
@@ -114,7 +114,7 @@ func (queryFSCmd *QueryFsCommand) Init(cmd *cobra.Command, args []string) error 
 			},
 		}
 		// new rpc
-		mdsRpc, err := common.CreateNewMdsRpc(cmd, "GetFsInfo")
+		mdsRpc, err := basecmd.CreateNewMdsRpc(cmd, "GetFsInfo")
 		if err != nil {
 			return err
 		}

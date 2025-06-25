@@ -61,7 +61,7 @@ func (mpCmd *MountPointCommand) AddFlags() {
 
 func (mpCmd *MountPointCommand) Init(cmd *cobra.Command, args []string) error {
 	// new rpc
-	mdsRpc, err := common.CreateNewMdsRpc(cmd, "ListFsInfo")
+	mdsRpc, err := basecmd.CreateNewMdsRpc(cmd, "ListFsInfo")
 	if err != nil {
 		return err
 	}

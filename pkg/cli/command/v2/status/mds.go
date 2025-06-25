@@ -54,7 +54,7 @@ func (mdsCmd *MdsCommand) AddFlags() {
 
 func (mdsCmd *MdsCommand) Init(cmd *cobra.Command, args []string) error {
 	// new rpc
-	mdsRpc, err := common.CreateNewMdsRpc(cmd, "GetMDSList")
+	mdsRpc, err := basecmd.CreateNewMdsRpc(cmd, "GetMDSList")
 	if err != nil {
 		return err
 	}

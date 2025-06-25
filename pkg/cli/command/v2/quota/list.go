@@ -62,7 +62,7 @@ func (listQuotaCmd *ListQuotaCommand) AddFlags() {
 
 func (listQuotaCmd *ListQuotaCommand) Init(cmd *cobra.Command, args []string) error {
 	// new prc
-	mdsRpc, err := common.CreateNewMdsRpc(cmd, "LoadDirQuotas")
+	mdsRpc, err := basecmd.CreateNewMdsRpc(cmd, "LoadDirQuotas")
 	if err != nil {
 		return err
 	}

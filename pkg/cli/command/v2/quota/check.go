@@ -102,7 +102,7 @@ func (checkQuotaCmd *CheckQuotaCommand) RunCommand(cmd *cobra.Command, args []st
 	repair := config.GetFlagBool(checkQuotaCmd.Cmd, config.DINGOFS_QUOTA_REPAIR)
 	if repair && !ok { // inconsistent and need to repair
 		// new prc
-		mdsRpc, err := common.CreateNewMdsRpc(cmd, "SetDirQuota")
+		mdsRpc, err := basecmd.CreateNewMdsRpc(cmd, "SetDirQuota")
 		if err != nil {
 			return err
 		}

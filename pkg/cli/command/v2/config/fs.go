@@ -64,7 +64,7 @@ func (fsQuotaCmd *SetFsQuotaCommand) AddFlags() {
 
 func (fsQuotaCmd *SetFsQuotaCommand) Init(cmd *cobra.Command, args []string) error {
 	// new prc
-	mdsRpc, err := common.CreateNewMdsRpc(cmd, "setFsQuota")
+	mdsRpc, err := basecmd.CreateNewMdsRpc(cmd, "setFsQuota")
 	if err != nil {
 		return err
 	}

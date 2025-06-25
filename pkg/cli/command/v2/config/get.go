@@ -135,7 +135,7 @@ func (fsQuotaCmd *GetFsQuotaCommand) ResultPlainOutput() error {
 
 func GetFsQuotaData(cmd *cobra.Command, fsId uint32) (*pbmdsv2.GetFsQuotaRequest, *pbmdsv2.GetFsQuotaResponse, error) {
 	// new prc
-	mdsRpc, err := common.CreateNewMdsRpc(cmd, "getFsQuota")
+	mdsRpc, err := basecmd.CreateNewMdsRpc(cmd, "getFsQuota")
 	if err != nil {
 		return nil, nil, err
 	}

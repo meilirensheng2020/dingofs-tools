@@ -17,6 +17,7 @@ package common
 import (
 	"context"
 	"fmt"
+	basecmd "github.com/dingodb/dingofs-tools/pkg/cli/command"
 	"log"
 	"path"
 	"strings"
@@ -35,26 +36,10 @@ import (
 
 //public functions
 
-// create new mds rpc
-func CreateNewMdsRpc(cmd *cobra.Command, serviceName string) (*base.Rpc, error) {
-	// get mds address
-	addrs, getAddrErr := config.GetFsMdsAddrSlice(cmd)
-	if getAddrErr.TypeCode() != cmderror.CODE_SUCCESS {
-		return nil, fmt.Errorf(getAddrErr.Message)
-	}
-	// new rpc
-	timeout := config.GetRpcTimeout(cmd)
-	retryTimes := config.GetRpcRetryTimes(cmd)
-	mdsRpc := base.NewRpc(addrs, timeout, retryTimes, serviceName)
-	mdsRpc.RpcDataShow = config.GetFlagBool(cmd, "verbose")
-
-	return mdsRpc, nil
-}
-
 // get fsinfo by fsid or fsname
 func GetFsInfo(cmd *cobra.Command, fsId uint32, fsName string) (*pbmdsv2.FsInfo, error) {
 	// new prc
-	mdsRpc, err := CreateNewMdsRpc(cmd, "GetFsInfo")
+	mdsRpc, err := basecmd.CreateNewMdsRpc(cmd, "GetFsInfo")
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +104,7 @@ func GetFsName(cmd *cobra.Command) (string, error) {
 // list filesystem info
 func ListFsInfo(cmd *cobra.Command) ([]*pbmdsv2.FsInfo, error) {
 	// new prc
-	mdsRpc, err := CreateNewMdsRpc(cmd, "ListFsInfo")
+	mdsRpc, err := basecmd.CreateNewMdsRpc(cmd, "ListFsInfo")
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +126,7 @@ func ListFsInfo(cmd *cobra.Command) ([]*pbmdsv2.FsInfo, error) {
 // GetDentry
 func GetDentry(cmd *cobra.Command, fsId uint32, parentId uint64, name string) (*pbmdsv2.Dentry, error) {
 	// new prc
-	mdsRpc, err := CreateNewMdsRpc(cmd, "GetDentry")
+	mdsRpc, err := basecmd.CreateNewMdsRpc(cmd, "GetDentry")
 	if err != nil {
 		return nil, err
 	}
@@ -189,7 +174,7 @@ func GetDirPathInodeId(cmd *cobra.Command, fsId uint32, path string) (uint64, er
 // get inode
 func GetInode(cmd *cobra.Command, fsId uint32, inodeId uint64) (*pbmdsv2.Inode, error) {
 	// new prc
-	mdsRpc, err := CreateNewMdsRpc(cmd, "GetInode")
+	mdsRpc, err := basecmd.CreateNewMdsRpc(cmd, "GetInode")
 	if err != nil {
 		return nil, err
 	}
@@ -210,7 +195,7 @@ func GetInode(cmd *cobra.Command, fsId uint32, inodeId uint64) (*pbmdsv2.Inode, 
 // list dentry
 func ListDentry(cmd *cobra.Command, fsId uint32, inodeId uint64) ([]*pbmdsv2.Dentry, error) {
 	// new prc
-	mdsRpc, err := CreateNewMdsRpc(cmd, "ListDentry")
+	mdsRpc, err := basecmd.CreateNewMdsRpc(cmd, "ListDentry")
 	if err != nil {
 		return nil, err
 	}

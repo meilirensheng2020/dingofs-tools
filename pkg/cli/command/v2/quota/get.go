@@ -134,7 +134,7 @@ func (getQuotaCmd *GetQuotaCommand) ResultPlainOutput() error {
 
 func GetDirQuotaData(cmd *cobra.Command, fsId uint32, dirInodeId uint64) (*pbmdsv2.GetDirQuotaRequest, *pbmdsv2.GetDirQuotaResponse, error) {
 	// new prc
-	mdsRpc, err := common.CreateNewMdsRpc(cmd, "GetDirQuota")
+	mdsRpc, err := basecmd.CreateNewMdsRpc(cmd, "GetDirQuota")
 	if err != nil {
 		return nil, nil, err
 	}

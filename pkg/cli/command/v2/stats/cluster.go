@@ -70,7 +70,7 @@ func (clusterCmd *ClusterCommand) AddFlags() {
 
 func (clusterCmd *ClusterCommand) Init(cmd *cobra.Command, args []string) error {
 	// new rpc
-	mdsRpc, err := common.CreateNewMdsRpc(cmd, "GetFsStats")
+	mdsRpc, err := basecmd.CreateNewMdsRpc(cmd, "GetFsStats")
 	if err != nil {
 		return err
 	}
