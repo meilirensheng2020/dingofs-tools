@@ -145,27 +145,34 @@ type ReweightMemberRpc struct {
 	cacheGroupClient cachegroup.CacheGroupMemberServiceClient
 }
 
-var _ base.RpcFunc = (*GetFsQuotaRpc)(nil)      // check interface
-var _ base.RpcFunc = (*SetFsQuotaRpc)(nil)      // check interface
-var _ base.RpcFunc = (*CheckQuotaRpc)(nil)      // check interface
-var _ base.RpcFunc = (*DeleteQuotaRpc)(nil)     // check interface
-var _ base.RpcFunc = (*GetQuotaRpc)(nil)        // check interface
-var _ base.RpcFunc = (*ListQuotaRpc)(nil)       // check interface
-var _ base.RpcFunc = (*SetQuotaRpc)(nil)        // check interface
-var _ base.RpcFunc = (*QueryCopysetRpc)(nil)    // check interface
-var _ base.RpcFunc = (*ListPartitionRpc)(nil)   // check interface
-var _ base.RpcFunc = (*GetInodeAttrRpc)(nil)    // check interface
-var _ base.RpcFunc = (*CreateInodeRpc)(nil)     // check interface
-var _ base.RpcFunc = (*UpdateInodeRpc)(nil)     // check interface
-var _ base.RpcFunc = (*DeleteInodeRpc)(nil)     // check interface
-var _ base.RpcFunc = (*GetInodeRpc)(nil)        // check interface
-var _ base.RpcFunc = (*ListDentryRpc)(nil)      // check interface
-var _ base.RpcFunc = (*GetDentryRpc)(nil)       // check interface
-var _ base.RpcFunc = (*GetFsStatsRpc)(nil)      // check interface
-var _ base.RpcFunc = (*ListClusterFsRpc)(nil)   // check interface
-var _ base.RpcFunc = (*ListCacheGroupRpc)(nil)  // check interface
-var _ base.RpcFunc = (*ListCacheMemberRpc)(nil) // check interface
-var _ base.RpcFunc = (*ReweightMemberRpc)(nil)  // check interface
+type LeaveCacheMemberRpc struct {
+	Info             *base.Rpc
+	Request          *cachegroup.LeaveCacheGroupRequest
+	cacheGroupClient cachegroup.CacheGroupMemberServiceClient
+}
+
+var _ base.RpcFunc = (*GetFsQuotaRpc)(nil)       // check interface
+var _ base.RpcFunc = (*SetFsQuotaRpc)(nil)       // check interface
+var _ base.RpcFunc = (*CheckQuotaRpc)(nil)       // check interface
+var _ base.RpcFunc = (*DeleteQuotaRpc)(nil)      // check interface
+var _ base.RpcFunc = (*GetQuotaRpc)(nil)         // check interface
+var _ base.RpcFunc = (*ListQuotaRpc)(nil)        // check interface
+var _ base.RpcFunc = (*SetQuotaRpc)(nil)         // check interface
+var _ base.RpcFunc = (*QueryCopysetRpc)(nil)     // check interface
+var _ base.RpcFunc = (*ListPartitionRpc)(nil)    // check interface
+var _ base.RpcFunc = (*GetInodeAttrRpc)(nil)     // check interface
+var _ base.RpcFunc = (*CreateInodeRpc)(nil)      // check interface
+var _ base.RpcFunc = (*UpdateInodeRpc)(nil)      // check interface
+var _ base.RpcFunc = (*DeleteInodeRpc)(nil)      // check interface
+var _ base.RpcFunc = (*GetInodeRpc)(nil)         // check interface
+var _ base.RpcFunc = (*ListDentryRpc)(nil)       // check interface
+var _ base.RpcFunc = (*GetDentryRpc)(nil)        // check interface
+var _ base.RpcFunc = (*GetFsStatsRpc)(nil)       // check interface
+var _ base.RpcFunc = (*ListClusterFsRpc)(nil)    // check interface
+var _ base.RpcFunc = (*ListCacheGroupRpc)(nil)   // check interface
+var _ base.RpcFunc = (*ListCacheMemberRpc)(nil)  // check interface
+var _ base.RpcFunc = (*ReweightMemberRpc)(nil)   // check interface
+var _ base.RpcFunc = (*LeaveCacheMemberRpc)(nil) // check interface
 
 func (getFsQuotaRpc *GetFsQuotaRpc) NewRpcClient(cc grpc.ClientConnInterface) {
 	getFsQuotaRpc.metaServerClient = metaserver.NewMetaServerServiceClient(cc)
@@ -383,5 +390,15 @@ func (rewightMember *ReweightMemberRpc) NewRpcClient(cc grpc.ClientConnInterface
 func (rewightMember *ReweightMemberRpc) Stub_Func(ctx context.Context) (interface{}, error) {
 	response, err := rewightMember.cacheGroupClient.ReweightMember(ctx, rewightMember.Request)
 	output.ShowRpcData(rewightMember.Request, response, rewightMember.Info.RpcDataShow)
+	return response, err
+}
+
+func (leaveMember *LeaveCacheMemberRpc) NewRpcClient(cc grpc.ClientConnInterface) {
+	leaveMember.cacheGroupClient = cachegroup.NewCacheGroupMemberServiceClient(cc)
+}
+
+func (leaveMember *LeaveCacheMemberRpc) Stub_Func(ctx context.Context) (interface{}, error) {
+	response, err := leaveMember.cacheGroupClient.LeaveCacheGroup(ctx, leaveMember.Request)
+	output.ShowRpcData(leaveMember.Request, response, leaveMember.Info.RpcDataShow)
 	return response, err
 }

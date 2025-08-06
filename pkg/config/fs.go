@@ -178,6 +178,8 @@ const (
 	DINGOFS_CACHE_GROUP    = "group"
 	DINGOFS_CACHE_MEMBERID = "memberid"
 	DINGOFS_CACHE_WEIGHT   = "weight"
+	DINGOFS_CACHE_IP       = "ip"
+	DINGOFS_CACHE_PORT     = "port"
 )
 
 var (
@@ -1010,4 +1012,12 @@ func AddCacheMemberId(cmd *cobra.Command) {
 
 func AddCacheMemberWeight(cmd *cobra.Command) {
 	AddUint32RequiredFlag(cmd, DINGOFS_CACHE_WEIGHT, "cachemember weight")
+}
+
+func AddCacheMemberIP(cmd *cobra.Command) {
+	AddStringRequiredFlag(cmd, DINGOFS_CACHE_IP, "cachemember name")
+}
+
+func AddCacheMemberPort(cmd *cobra.Command) {
+	AddUint32RequiredFlag(cmd, DINGOFS_CACHE_PORT, "cachemember port")
 }

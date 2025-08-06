@@ -24,6 +24,7 @@ package delete
 
 import (
 	basecmd "github.com/dingodb/dingofs-tools/pkg/cli/command"
+	"github.com/dingodb/dingofs-tools/pkg/cli/command/v1/delete/cachemember"
 	"github.com/dingodb/dingofs-tools/pkg/cli/command/v1/delete/fs"
 	"github.com/dingodb/dingofs-tools/pkg/cli/command/v1/delete/metaserver"
 	"github.com/spf13/cobra"
@@ -39,6 +40,7 @@ func (deleteCmd *DeleteCommand) AddSubCommands() {
 	deleteCmd.Cmd.AddCommand(
 		fs.NewFsCommand(),
 		metaserver.NewDeleteMetaServerCommand(),
+		cachemember.NewDeleteCacheMemberCommand(),
 	)
 }
 
