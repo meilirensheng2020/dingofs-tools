@@ -24,6 +24,7 @@ package cmderror
 
 import (
 	"fmt"
+	"github.com/dingodb/dingofs-tools/proto/dingofs/proto/cachegroup"
 
 	fscopyset "github.com/dingodb/dingofs-tools/proto/dingofs/proto/copyset"
 	pbmdsv2error "github.com/dingodb/dingofs-tools/proto/dingofs/proto/error"
@@ -400,7 +401,6 @@ var (
 	ErrGetFsUsage = func() *CmdError {
 		return NewInternalCmdError(44, "get the usage of the file system fail, err: %s")
 	}
-
 	// http error
 	ErrHttpUnreadableResult = func() *CmdError {
 		return NewHttpResultCmdError(1, "http response is unreadable, the uri is: %s, the error is: %s")
@@ -591,5 +591,16 @@ var (
 			message = fmt.Sprintf("metaserver response error, error is %s", code.String())
 		}
 		return NewRpcReultCmdError(statusCode, message)
+	}
+
+	ErrDingoCacheRequest = func(code cachegroup.CacheGroupErrCode) *CmdError {
+		var message string
+		switch code {
+		case cachegroup.CacheGroupErrCode_CacheGroupOk:
+			message = "success"
+		default:
+			message = fmt.Sprintf("dingoCache response error, error is %s", code.String())
+		}
+		return NewRpcReultCmdError(int(code), message)
 	}
 )
