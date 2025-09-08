@@ -15,6 +15,7 @@
 package basecmd
 
 import (
+	"github.com/dingodb/dingofs-tools/internal/logger"
 	"os"
 
 	cmderror "github.com/dingodb/dingofs-tools/internal/error"
@@ -31,15 +32,16 @@ import (
 // Error Use to indicate whether the command is wrong
 // and the reason for the execution error
 type FinalDingoCmd struct {
-	Use      string             `json:"-"`
-	Short    string             `json:"-"`
-	Long     string             `json:"-"`
-	Example  string             `json:"-"`
-	Error    *cmderror.CmdError `json:"error"`
-	Result   interface{}        `json:"result"`
-	TableNew *tablewriter.Table `json:"-"`
-	Header   []string           `json:"-"`
-	Cmd      *cobra.Command     `json:"-"`
+	Use      string              `json:"-"`
+	Short    string              `json:"-"`
+	Long     string              `json:"-"`
+	Example  string              `json:"-"`
+	Error    *cmderror.CmdError  `json:"error"`
+	Result   interface{}         `json:"result"`
+	TableNew *tablewriter.Table  `json:"-"`
+	Header   []string            `json:"-"`
+	Cmd      *cobra.Command      `json:"-"`
+	Logger   *logger.DingoLogger `json:"-"`
 }
 
 func (fc *FinalDingoCmd) SetHeader(header []string) {
@@ -88,6 +90,16 @@ func NewFinalDingoCli(cli *FinalDingoCmd, funcs FinalDingoCmdFunc) *cobra.Comman
 		Short:   cli.Short,
 		Long:    cli.Long,
 		Example: cli.Example,
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			if cli.Logger != nil {
+				return
+			}
+			logfile := config.GetFlagString(cli.Cmd, config.LOGFILE)
+			loglevel := config.GetFlagString(cli.Cmd, config.LOGLEVEL)
+			logfmt := config.GetFlagString(cli.Cmd, config.LOGFMT)
+
+			cli.Logger = logger.InitGlobalLogger(logger.WithLogFile(logfile), logger.WithLogLevel(loglevel), logger.WithFormat(logfmt))
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			show := config.GetFlagBool(cli.Cmd, config.VERBOSE)
 			process.SetShow(show)
@@ -104,6 +116,7 @@ func NewFinalDingoCli(cli *FinalDingoCmd, funcs FinalDingoCmdFunc) *cobra.Comman
 		},
 		SilenceUsage: false,
 	}
+
 	config.AddFormatFlag(cli.Cmd)
 	funcs.AddFlags()
 	cobratemplate.SetFlagErrorFunc(cli.Cmd)

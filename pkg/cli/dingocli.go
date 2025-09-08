@@ -140,8 +140,11 @@ func newDingoCommand() *cobra.Command {
 
 	rootCmd.PersistentFlags().BoolP("help", "", false, "print help")
 	rootCmd.PersistentFlags().StringP("conf", "", "", "config file (default is $HOME/.dingo/dingo.yaml or /etc/dingo/dingo.yaml)")
-	config.AddShowErrorPFlag(rootCmd)
 	rootCmd.PersistentFlags().BoolP("verbose", "", false, "show some extra info")
+	config.AddShowErrorPFlag(rootCmd)
+	config.AddLogfilePFlag(rootCmd)
+	config.AddLoglevelPFlag(rootCmd)
+	config.AddLogfmtPFlag(rootCmd)
 	viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
 
 	addSubCommands(rootCmd)
