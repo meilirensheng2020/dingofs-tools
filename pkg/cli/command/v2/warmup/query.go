@@ -131,7 +131,7 @@ func (qCmd *QueryCommand) RunCommand(cmd *cobra.Command, args []string) error {
 			break
 		}
 		warmErrors, err = strconv.ParseUint(strs[2], 10, 64)
-		if err != nil || warmErrors > 0 {
+		if err != nil {
 			break
 		}
 		if (finished + warmErrors) == total {
