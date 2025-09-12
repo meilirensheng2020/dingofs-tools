@@ -1,5 +1,5 @@
 # Copyright (C) 2022 Jingli Chen (Wine93), NetEase Inc.
-.PHONY: build debug init proto clean install_grpc_protobuf
+.PHONY: build debug init proto clean install_grpc_tools
 
 version=4.2
 GITHUB_PROXY="https://ghproxy.com/"
@@ -71,6 +71,11 @@ DEBUG_FLAGS += $(CGO_DEBUG_FLAG)
 # packages
 PACKAGES := $(PWD)/cmd/dingo/main.go
 
+# tools
+GOPATH := $(shell go env GOPATH)
+PROTOC_GEN_GO := $(GOPATH)/bin/protoc-gen-go
+PROTOC_GEN_GO_GRPC := $(GOPATH)/bin/protoc-gen-go-grpc
+
 build: proto
 	$(GOENV) $(GO) build -o $(OUTPUT) $(BUILD_FLAGS) $(PACKAGES)
 debug: proto
@@ -79,16 +84,16 @@ init: proto
 	go mod init github.com/dingodb/dingofs-tools
 	go mod tidy
 
-proto: install_grpc_protobuf
+proto: install_grpc_tools
 	@bash mk-proto.sh
 
-install_grpc_protobuf:
-	# wget ${GITHUB_PROXY}https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip \
-    # && unzip protoc-${PROTOC_VERSION}-linux-x86_64.zip "bin/protoc" -d /usr/ \
-    # && rm protoc-${PROTOC_VERSION}-linux-x86_64.zip
+install_grpc_tools: $(PROTOC_GEN_GO) $(PROTOC_GEN_GO_GRPC)
+$(PROTOC_GEN_GO):
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@${PROTOC_GEN_GO_VERSION}
+$(PROTOC_GEN_GO_GRPC):
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@${PROTOC_GEN_GO_GRPC_VERSION}
 
 clean:
 	rm -rf sbin
 	rm -rf proto/*
+	rm -f $(PROTOC_GEN_GO) $(PROTOC_GEN_GO_GRPC)
