@@ -126,13 +126,14 @@ func runList(cmd *cobra.Command, dingocli *cli.DingoCli, options listOptions) er
 	}
 
 	// set table header
-	header := []string{common.ROW_MEMBERID, common.ROW_IP, common.ROW_PORT, common.ROW_WEIGHT, common.ROW_LOCKED, common.ROW_CREATE_TIME, common.ROW_LASTONLINETIME, common.ROW_STATE, common.ROW_GROUP}
+	header := []string{common.ROW_ID, common.ROW_MEMBERID, common.ROW_IP, common.ROW_PORT, common.ROW_WEIGHT, common.ROW_LOCKED, common.ROW_CREATE_TIME, common.ROW_LASTONLINETIME, common.ROW_STATE, common.ROW_GROUP}
 	table.SetHeader(header)
 	// fill table
 	members := result.GetMembers()
 	rows := make([]map[string]string, 0)
 	for _, member := range members {
 		row := make(map[string]string)
+
 		row[common.ROW_MEMBERID] = member.GetMemberId()
 		ip := member.GetIp()
 		port := member.GetPort()
@@ -163,7 +164,11 @@ func runList(cmd *cobra.Command, dingocli *cli.DingoCli, options listOptions) er
 		rows = append(rows, row)
 	}
 
-	list := table.ListMap2ListSortByKeys(rows, header, []string{common.ROW_GROUP})
+	list := table.ListMap2ListSortByKeys(rows, header, []string{common.ROW_IP, common.ROW_PORT})
+	for i := range list {
+		list[i][0] = fmt.Sprintf("%d", i+1) // ID is the first column in header
+	}
+
 	table.AppendBulk(list)
 	table.RenderWithNoData("no cachemember in cluster")
 
