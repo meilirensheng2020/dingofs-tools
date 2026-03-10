@@ -17,6 +17,8 @@
 package group
 
 import (
+	"fmt"
+
 	"github.com/dingodb/dingocli/cli/cli"
 	"github.com/dingodb/dingocli/internal/common"
 	"github.com/dingodb/dingocli/internal/errno"
@@ -115,7 +117,7 @@ func runList(cmd *cobra.Command, dingocli *cli.DingoCli, options listOptions) er
 	}
 
 	// set table header
-	header := []string{common.ROW_GROUP}
+	header := []string{common.ROW_ID, common.ROW_GROUP}
 	table.SetHeader(header)
 	// fill table
 	groups := result.GetGroupNames()
@@ -128,6 +130,9 @@ func runList(cmd *cobra.Command, dingocli *cli.DingoCli, options listOptions) er
 	}
 
 	list := table.ListMap2ListSortByKeys(rows, header, []string{common.ROW_GROUP})
+	for i := range list {
+		list[i][0] = fmt.Sprintf("%d", i+1) // ID is the first column in header
+	}
 	table.AppendBulk(list)
 	table.RenderWithNoData("no cachegroup in cluster")
 
