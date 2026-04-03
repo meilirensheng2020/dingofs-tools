@@ -1,0 +1,23 @@
+{
+  "hooks": {
+    "ToolCallCommand": {
+      "Edit": {
+        "cmd": "echo 'Claude is editing: {{file_path}}'",
+        "runInShell": true
+      }
+    },
+    "AfterCommand": {
+      "commit": {
+        "cmd": "echo 'Claude Code commit completed'",
+        "runInShell": true
+      }
+    }
+  },
+  "git": {
+    "autoCommit": true,
+    "commitMessage": {
+      "prefix": "[claude-code]",
+      "includeSummary": true
+    }
+  }
+}
